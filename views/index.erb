@@ -12,18 +12,50 @@
   <h1>Create a new product here:</h1>
     <form class="" action="<%=APP_URL+'/products'%>" method="post">
 
-      <label for="title">Product Title</label>
-      <input type="text" name="title" value="">
+        <label for="title">Product Title</label>
+        <div class="field">
+          <input type="text" name="title" value="">
+        </div>
 
       <label for="vendor">Product Vendor</label>
-      <input type="text" name="vendor" value="">
+      <div class="field">
+        <input type="text" name="vendor" value="">
+      </div>
 
       <label for="product_type">Product Type</label>
-      <input type="text" name="product-type" value="">
+      <div class="field">
+        <input type="text" name="product-type" value="">
+      </div>
 
       <label for="price">Product Price</label>
-      <input type="text" name="price" value="">
+      <div class="field">
+        <input type="text" name="price" value="">
+      </div>
 
-      <input type="submit" value="Create Product">
+      <input type="submit" value="Create Product" class="ui button">
     </form>
+
+    <h1>Create a webhook service</h1>
+      <form class="" action="<%=APP_URL+'/webhooks'%>" method="post">
+
+          <label for="topic">Topic</label>
+          <div class="field">
+            <input type="text" name="topic" value="">
+          </div>
+
+        <label for="address"> Address</label>
+        <div class="field">
+          <input type="text" name="address" value="">
+        </div>
+
+        <label for="format">Format</label>
+        <div class="field">
+          <select name="format">
+            <option value="json" name="format">JSON</option>
+            <option value="xml" name="format">XML</option>
+          </select>
+        </div>
+
+        <input type="submit" value="Create Webhook" class="ui button">
+      </form>
 </body>

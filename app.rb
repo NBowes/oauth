@@ -39,6 +39,18 @@ class NatesProducts < Sinatra::Base
     redirect "/"
   end
 
+  post '/webhooks' do
+    shop = @@tokens.map { |k,v| "#{k}" }.join("")
+    access_token = @@tokens.map { |k,v| "#{v}" }.join("")
+    create_session(shop, access_token)
+    webhook = {
+      topic: params['topic'],
+      address: params['address'],
+      format: params['format']
+    }
+    ShopifyAPI::Webhook.create(webhook)
+    redirect "/"
+  end
 
   get '/natesproducts/install' do
 
