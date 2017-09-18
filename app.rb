@@ -24,8 +24,8 @@ class NatesProducts < Sinatra::Base
   end
 
   post '/products' do
-    shop = @@tokens.map { |k,v| "#{k}" }.join("")
-    access_token = @@tokens.map { |k,v| "#{v}" }.join("")
+    shop = shop_strings(@@tokens)
+    access_token = access_token_string(@@tokens)
     create_session(shop, access_token)
     product = {
       title: params['title'],
@@ -40,8 +40,8 @@ class NatesProducts < Sinatra::Base
   end
 
   post '/webhooks' do
-    shop = @@tokens.map { |k,v| "#{k}" }.join("")
-    access_token = @@tokens.map { |k,v| "#{v}" }.join("")
+    shop = shop_strings(@@tokens)
+    access_token = access_token_string(@@tokens)
     create_session(shop, access_token)
     webhook = {
       topic: params['topic'],
@@ -107,5 +107,12 @@ class NatesProducts < Sinatra::Base
     ShopifyAPI::Base.activate_session(session)
   end
 
+  def shop_strings(tokens)
+    shop = tokens.map { |k,v| "#{k}" }.join("")
+  end
+
+  def access_token_string(tokens)
+    access_token = tokens.map { |k,v| "#{v}" }.join("")
+  end
 end
 NatesProducts.run!
