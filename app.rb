@@ -8,7 +8,7 @@ Dotenv.load
 
 API_KEY = ENV['API_KEY']
 API_SECRET = ENV['API_SECRET']
-APP_URL = 'https://91f323ae.ngrok.io'
+APP_URL = 'https://93cbb508.ngrok.io'
 
 class NatesProducts < Sinatra::Base
     attr_reader :tokens
@@ -49,11 +49,11 @@ class NatesProducts < Sinatra::Base
       format: params['format']
     }
     ShopifyAPI::Webhook.create(webhook)
+
     redirect "/"
   end
 
   get '/natesproducts/install' do
-
       shop = params['shop']
       scope = 'write_orders, write_products'
       install_url = "https://#{shop}/admin/oauth/authorize?client_id=#{API_KEY}&scope=#{scope}&redirect_uri=#{APP_URL}/natesproducts/auth"
