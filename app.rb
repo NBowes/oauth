@@ -3,12 +3,13 @@ require 'sinatra'
 require 'httparty'
 require 'dotenv'
 require 'openssl'
+require 'base64'
 require 'pry'
 Dotenv.load
 
 API_KEY = ENV['API_KEY']
 API_SECRET = ENV['API_SECRET']
-APP_URL = 'https://93cbb508.ngrok.io'
+APP_URL = 'https://dfcca1a4.ngrok.io'
 
 class NatesProducts < Sinatra::Base
     attr_reader :tokens
@@ -49,9 +50,31 @@ class NatesProducts < Sinatra::Base
       format: params['format']
     }
     ShopifyAPI::Webhook.create(webhook)
-
-    redirect "/"
   end
+
+  post '/webhooks/product_update' do
+    hmac = request.env['HTTP_X_SHOPIFY_HMAC_SHA256']
+
+    request.body.rewind
+    data = request.body.read
+
+    webhook = verify_webhook(hmac,data)
+    if webhook
+      puts "200 - webhook successfull"
+       shop = request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']
+       token = @@tokens[shop]
+       create_session(shop, token)
+
+      json_data = JSON.parse(data)
+       id = json_data['id']
+       product = ShopifyAPI::Product.find(id)
+       product.title = "Webhook troll"
+       product.save
+    else
+      puts  "Webhook could not be created."
+    end
+  end
+
 
   get '/natesproducts/install' do
       shop = params['shop']
@@ -94,11 +117,10 @@ class NatesProducts < Sinatra::Base
         product_type: "sinatra",
         vendor: "oauth"
       }
-      ShopifyAPI::Product.create(product)
-
+      create_webhook
       redirect "https://#{params['shop']}/admin/apps"
     else
-      status [403, "NOPE"]
+      puts "There was a problem in the authorization process. Please try again."
     end
   end
 
@@ -113,6 +135,21 @@ class NatesProducts < Sinatra::Base
 
   def access_token_string(tokens)
     access_token = tokens.map { |k,v| "#{v}" }.join("")
+  end
+
+  def create_webhook
+    webhook = {
+      topic: 'products/update',
+      address:"#{APP_URL}/webhooks/product_update",
+      format: 'json'
+    }
+    ShopifyAPI::Webhook.create(webhook)
+  end
+  def verify_webhook(hmac, data)
+    digest = OpenSSL::Digest.new('sha256')
+    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, API_SECRET, data)).strip
+
+    hmac == calculated_hmac
   end
 end
 NatesProducts.run!
